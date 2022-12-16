@@ -33,19 +33,11 @@ data AppState = AppState
 
 makeLenses ''AppState
 
+pattern Ctrl k = EvKey (KChar k) [MCtrl]
+
 handleEvent :: BrickEvent () () -> EventM () AppState ()
 handleEvent (VtyEvent (EvKey KEsc [])) = halt
-handleEvent (VtyEvent (EvKey (KChar 'n') [MCtrl])) = do
-  st <- get
-  let numEntries = length (st ^. entries)
-  if numEntries == 0
-    then continueWithoutRedraw
-    else do
-      let n' = case st ^. entrySelectPos of
-            Just n -> min (n + 1) numEntries
-            Nothing -> 0
-      put $ st & entrySelectPos ?~ n'
-handleEvent (VtyEvent (EvKey (KChar 'p') [MCtrl])) = do
+handleEvent (VtyEvent (Ctrl k)) | k `elem` ['n', 'p'] = do
   st <- get
   let numEntries = length (st ^. entries)
   when (numEntries == 0) continueWithoutRedraw
