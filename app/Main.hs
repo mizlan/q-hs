@@ -91,7 +91,7 @@ dictSource q = do
   V.take 10 . V.filter (T.isPrefixOf q) <$> dict
 
 googleSource :: Text -> IO (Vector Text)
-googleSource "" = pure $ pure "nothing to see here"
+googleSource "" = pure V.empty
 googleSource q = do
   r <- runReq defaultHttpConfig $ req GET url NoReqBody jsonResponse params
   case responseBody r of
